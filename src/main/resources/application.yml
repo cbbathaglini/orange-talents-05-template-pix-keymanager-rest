@@ -1,3 +1,18 @@
 micronaut:
   application:
     name: desafioPixRest
+  server:
+    port: 8078
+
+
+grpc:
+  client:
+    plaintext: true
+    max-retry-attempts: 10
+  channels:
+    desafioPixrest: #nome do canal em GrpcClientFactory
+      address: 'localhost:50051'
+#      plaintext: true
+#      max-retry-attempts: 5
+  server:
+    port: 8077
