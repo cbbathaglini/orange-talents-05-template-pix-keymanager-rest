@@ -1,6 +1,8 @@
 package br.com.pix.rest.chave.registro
 
 import br.com.pix.ChavePIXServiceGrpc
+import br.com.pix.RegistraChavePixRequest
+import br.com.pix.RegistraChavePixResponse
 import com.google.protobuf.Any
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
@@ -19,35 +21,34 @@ import javax.validation.Valid
 @Validated
 class RegistraChaveController(private val gRPCClient: ChavePIXServiceGrpc.ChavePIXServiceBlockingStub) {
 
-    @Post("/registra")
+    @Post("/registra/pix")
     fun salvarChave(@PathVariable(value="idCliente") idCliente : UUID,
                  @Body @Valid request : RegistraChaveDTORequest
-    ) : HttpResponse<Any>{
+    ) : HttpResponse<Any> {
 
-        val request = request.converterRequestGrpc(idCliente)
+        val request : RegistraChavePixRequest = request.converterRequestGrpc(idCliente)
 
         try {
             var response = gRPCClient.salvarChave(request)
 
             //Em caso de sucesso, a chave Pix deve ser registrada e armazenada no sistema;
             return HttpResponse.ok()
-        }catch (e: StatusRuntimeException){
+        }catch (e: StatusRuntimeException) {
             val statusCode = e.status.code
             val description = e.status.description
 
             //Em caso de chave já existente, deve-se retornar o status de erro 422-UNPROCESSABLE_ENTITY com uma mensagem amigável para o usuário;
-            if(statusCode == Status.Code.ALREADY_EXISTS){
-                throw HttpStatusException(HttpStatus.UNPROCESSABLE_ENTITY,description)
+            if (statusCode == Status.Code.ALREADY_EXISTS) {
+                throw HttpStatusException(HttpStatus.UNPROCESSABLE_ENTITY, description)
             }
 
-
-            if(statusCode == Status.Code.INVALID_ARGUMENT){
-                throw HttpStatusException(HttpStatus.BAD_REQUEST,description)
+            if (statusCode == Status.Code.INVALID_ARGUMENT) {
+                throw HttpStatusException(HttpStatus.BAD_REQUEST, description)
             }
 
-            if(statusCode == Status.Code.PERMISSION_DENIED){
+            if (statusCode == Status.Code.PERMISSION_DENIED) {
                 val statusProto = StatusProto.fromThrowable(e)
-                if(statusProto == null){
+                if (statusProto == null) {
                     throw HttpStatusException(HttpStatus.FORBIDDEN, description)
                 }
             }
@@ -57,7 +58,6 @@ class RegistraChaveController(private val gRPCClient: ChavePIXServiceGrpc.ChaveP
         }
 
     }
-
 
 
 }

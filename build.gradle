@@ -42,7 +42,10 @@ dependencies {
 
     implementation("io.micronaut.netflix:micronaut-netflix-hystrix")
     implementation("io.micronaut.data:micronaut-data-hibernate-jpa")
-    kaptTest "io.micronaut:micronaut-inject-java"
+    testAnnotationProcessor("io.micronaut:micronaut-inject-java")
+    testImplementation("com.h2database:h2")
+    testImplementation("org.mockito:mockito-core:3.8.0")
+    testImplementation("org.mockito:mockito-inline:3.8.0")
 }
 
 
