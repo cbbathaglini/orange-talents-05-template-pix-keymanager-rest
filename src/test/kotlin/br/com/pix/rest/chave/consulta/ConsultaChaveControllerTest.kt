@@ -2,13 +2,19 @@ package br.com.pix.rest.chave.consulta
 
 import br.com.pix.*
 import com.google.protobuf.Timestamp
+import io.grpc.Status
+import io.grpc.StatusRuntimeException
 import io.micronaut.context.annotation.Replaces
 import io.micronaut.http.HttpRequest
+import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
+import io.micronaut.http.client.exceptions.HttpClientResponseException
+import io.micronaut.http.exceptions.HttpStatusException
 import io.micronaut.test.annotation.TransactionMode
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import io.netty.handler.codec.http.HttpResponseStatus
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito
@@ -17,6 +23,8 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 import javax.inject.Inject
 import javax.inject.Singleton
+import org.junit.jupiter.api.assertThrows
+
 
 @MicronautTest(
     rollback = false, //default = true
@@ -53,6 +61,23 @@ internal class ConsultaChaveControllerTest{
 
         assertEquals(HttpStatus.OK, response.status)
         assertNotNull(response.body())
+    }
+
+    @Test
+    fun `aquele que retorna NOT_FOUND`(){
+        val idCliente : String = "de95a228-1f27-4ad2-907e-e5a2d816e9b0"
+        val idPix : String = "121b91af-0154-446d-a491-a42028244e1c"
+
+        Mockito.`when`(grpcClient.consultar(Mockito.any())).thenThrow(HttpStatusException(HttpStatus.NOT_FOUND, "A chave não existe"))
+
+        val request = HttpRequest.GET<Any>("/api/v1/clientes/${idCliente}/pix/keys/${idPix}")
+
+        val response = assertThrows<HttpClientResponseException> {
+            clientHttp.toBlocking().exchange(request, Any::class.java)
+        }
+        println(response)
+        assertEquals("A chave não existe",response.message)
+        assertEquals(HttpStatus.NOT_FOUND,response.status)
     }
 
 
