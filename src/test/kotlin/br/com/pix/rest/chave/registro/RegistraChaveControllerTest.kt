@@ -46,6 +46,7 @@ internal class RegistraChaveControllerTest{
     @Test
     fun `aquele que cadastra uma nova chave pix`(){
         val idCliente : UUID = UUID.fromString("de95a228-1f27-4ad2-907e-e5a2d816e9bc")
+
         val registraChaveRequestGrpc = RegistraChavePixRequest.newBuilder()
             .setChave(UUID.randomUUID().toString())
             .setTipoDeChave(TipoChave.RANDOM)
