@@ -78,6 +78,9 @@ internal class ConsultaChaveControllerTest{
         println(response)
         assertEquals("A chave não existe",response.message)
         assertEquals(HttpStatus.NOT_FOUND,response.status)
+
+
+
     }
 
 
